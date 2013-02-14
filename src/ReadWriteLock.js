@@ -1,4 +1,6 @@
 module.exports = function ReadWriteLock() {
+	'use strict';
+
 	var table = {};
 
 	function readLock(key, callback) {
