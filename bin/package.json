@@ -1,0 +1,17 @@
+{
+	"name": "rwlock",
+	"version": "1.0.0",
+	"description": "Read-write lock implementation for Node.",
+	"keywords": "read write lock locker reader writer",
+	"homepage": "https://github.com/canvace/ReadWriteLock",
+	"bugs": "https://github.com/canvace/ReadWriteLock/issues",
+	"author": "Alberto La Rocca <a71104@gmail.com> (https://github.com/71104)",
+	"files": [
+		"rwlock.js"
+	],
+	"main": "rwlock.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/canvace/ReadWriteLock.git"
+	}
+}
