@@ -109,12 +109,27 @@ module.exports = function ReadWriteLock() {
 	/**
 	 * TODO
 	 *
-	 * @method criticalSection
+	 * @method readSection
 	 * @param key {String} TODO
 	 * @param callback {Function} TODO
 	 * @param [timeout] {Number} TODO
 	 */
-	this.criticalSection = function (key, callback, timeout) {
+	this.readSection = function (key, callback, timeout) {
+		readLock(key, function (release) {
+			callback();
+			release();
+		}, timeout);
+	};
+
+	/**
+	 * TODO
+	 *
+	 * @method writeSection
+	 * @param key {String} TODO
+	 * @param callback {Function} TODO
+	 * @param [timeout] {Number} TODO
+	 */
+	this.writeSection = function (key, callback, timeout) {
 		writeLock(key, function (release) {
 			callback();
 			release();
