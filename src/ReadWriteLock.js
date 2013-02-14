@@ -24,30 +24,34 @@ module.exports = function ReadWriteLock() {
 			return function () {
 				if (!released) {
 					released = true;
-					if (--table[key].readers < 1) {
-						if (table[key].callbacks.length) {
-							table[key].callbacks.shift()();
-						} else {
-							delete table[key];
-						}
+					table[key].readers--;
+					if (table[key].queue.length) {
+						table[key].queue[0]();
+					} else {
+						delete table[key];
 					}
 				}
 			};
 		}());
 		if (key in table) {
-			if (table[key].readers > 0) {
-				table[key].readers++;
-				callback(release);
-			} else {
-				table[key].callbacks(function () {
-					table[key].readers++;
-					// TODO
+			if ((table[key].readers < 0) || table[key].queue.length) {
+				table[key].queue.push(function () {
+					if (table[key].readers >= 0) {
+						table[key].queue.shift();
+						table[key].readers++;
+						callback(release);
+						if (table[key].queue.length) {
+							table[key].queue[0]();
+						}
+					}
 				});
+			} else {
+				table[key].readers++;
 			}
 		} else {
 			table[key] = {
 				readers: 1,
-				callbacks: []
+				queue: []
 			};
 			callback(release);
 		}
@@ -69,8 +73,8 @@ module.exports = function ReadWriteLock() {
 				if (!released) {
 					released = true;
 					table[key].readers = 0;
-					if (table[key].callbacks.length) {
-						table[key].callbacks.shift()();
+					if (table[key].queue.length) {
+						table[key].queue[0]();
 					} else {
 						delete table[key];
 					}
@@ -78,13 +82,22 @@ module.exports = function ReadWriteLock() {
 			};
 		}());
 		if (key in table) {
-			table[key].callbacks.push(function () {
-				// TODO
-			});
+			if (table[key].readers || table[key].queue.length) {
+				table[key].queue.push(function () {
+					if (!table[key].readers) {
+						table[key].queue.shift();
+						table[key].readers = -1;
+						callback(release);
+					}
+				});
+			} else {
+				table[key].readers = -1;
+				callback(release);
+			}
 		} else {
 			table[key] = {
 				readers: -1,
-				callbacks: []
+				queue: []
 			};
 			callback(release);
 		}
