@@ -1,7 +1,7 @@
 {
 	"name": "ReadWriteLock",
 	"description": "Read-write lock implementation for Node.",
-	"version": "1.0.0",
+	"version": "2.1.0",
 	"url": "https://github.com/canvace/ReadWriteLock",
 	"options": {
 		"outdir": "doc",

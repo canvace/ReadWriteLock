@@ -16,9 +16,15 @@ module.exports = function ReadWriteLock() {
 	 * @param key {String} TODO
 	 * @param callback {Function} TODO
 	 * @param callback.release {Function} TODO
-	 * @param [timeout] {Number} TODO
+	 * @param [options] {Object} TODO
+	 * @param [options.scope] {Object} TODO
+	 * @param [options.timeout] {Number} TODO
+	 * @param [options.timeoutCallback] {Function} TODO
 	 */
-	function readLock(key, callback) {
+	function readLock(key, callback, options) {
+		if (typeof options !== 'object') {
+			options = {};
+		}
 		var release = (function () {
 			var released = false;
 			return function () {
@@ -39,7 +45,11 @@ module.exports = function ReadWriteLock() {
 					if (table[key].readers >= 0) {
 						table[key].queue.shift();
 						table[key].readers++;
-						callback(release);
+						if (options.scope) {
+							callback.call(options.scope, release);
+						} else {
+							callback(release);
+						}
 						if (table[key].queue.length) {
 							table[key].queue[0]();
 						}
@@ -53,7 +63,11 @@ module.exports = function ReadWriteLock() {
 				readers: 1,
 				queue: []
 			};
-			callback(release);
+			if (options.scope) {
+				callback.call(options.scope, release);
+			} else {
+				callback(release);
+			}
 		}
 	}
 
@@ -64,9 +78,15 @@ module.exports = function ReadWriteLock() {
 	 * @param key {String} TODO
 	 * @param callback {Function} TODO
 	 * @param callback.release {Function} TODO
-	 * @param [timeout] {Number} TODO
+	 * @param [options] {Object} TODO
+	 * @param [options.scope] {Object} TODO
+	 * @param [options.timeout] {Number} TODO
+	 * @param [options.timeoutCallback] {Function} TODO
 	 */
-	function writeLock(key, callback) {
+	function writeLock(key, callback, options) {
+		if (typeof options !== 'object') {
+			options = {};
+		}
 		var release = (function () {
 			var released = false;
 			return function () {
@@ -87,19 +107,31 @@ module.exports = function ReadWriteLock() {
 					if (!table[key].readers) {
 						table[key].queue.shift();
 						table[key].readers = -1;
-						callback(release);
+						if (options.scope) {
+							callback.call(options.scope, release);
+						} else {
+							callback(release);
+						}
 					}
 				});
 			} else {
 				table[key].readers = -1;
-				callback(release);
+				if (options.scope) {
+					callback.call(options.scope, release);
+				} else {
+					callback(release);
+				}
 			}
 		} else {
 			table[key] = {
 				readers: -1,
 				queue: []
 			};
-			callback(release);
+			if (options.scope) {
+				callback.call(options.scope, release);
+			} else {
+				callback(release);
+			}
 		}
 	}
 
@@ -112,13 +144,16 @@ module.exports = function ReadWriteLock() {
 	 * @method readSection
 	 * @param key {String} TODO
 	 * @param callback {Function} TODO
-	 * @param [timeout] {Number} TODO
+	 * @param [options] {Object} TODO
+	 * @param [options.scope] {Object} TODO
+	 * @param [options.timeout] {Number} TODO
+	 * @param [options.timeoutCallback] {Function} TODO
 	 */
-	this.readSection = function (key, callback, timeout) {
+	this.readSection = function (key, callback, options) {
 		readLock(key, function (release) {
-			callback();
+			callback.call(this);
 			release();
-		}, timeout);
+		}, options);
 	};
 
 	/**
@@ -127,12 +162,15 @@ module.exports = function ReadWriteLock() {
 	 * @method writeSection
 	 * @param key {String} TODO
 	 * @param callback {Function} TODO
-	 * @param [timeout] {Number} TODO
+	 * @param [options] {Object} TODO
+	 * @param [options.scope] {Object} TODO
+	 * @param [options.timeout] {Number} TODO
+	 * @param [options.timeoutCallback] {Function} TODO
 	 */
-	this.writeSection = function (key, callback, timeout) {
+	this.writeSection = function (key, callback, options) {
 		writeLock(key, function (release) {
-			callback();
+			callback.call(this);
 			release();
-		}, timeout);
+		}, options);
 	};
 };
