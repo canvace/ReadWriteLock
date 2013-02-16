@@ -40,7 +40,7 @@ module.exports = function ReadWriteLock() {
 			};
 		}());
 		if (key in table) {
-			if ((table[key].readers < 0) || table[key].queue.length) {
+			if ((table[key].readers <= 0) || table[key].queue.length) {
 				table[key].queue.push(function () {
 					if (table[key].readers >= 0) {
 						table[key].queue.shift();
@@ -57,6 +57,11 @@ module.exports = function ReadWriteLock() {
 				});
 			} else {
 				table[key].readers++;
+				if (options.scope) {
+					callback.call(options.scope, release);
+				} else {
+					callback(release);
+				}
 			}
 		} else {
 			table[key] = {

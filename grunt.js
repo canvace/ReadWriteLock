@@ -1,7 +1,7 @@
 module.exports = function (grunt) {
 	grunt.initConfig({
 		meta: {
-			version: '2.1.0',
+			version: '2.1.1',
 			banner: '/*! ReadWriteLock.js - v<%= meta.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
 				'* Part of the Canvace technology <http://www.canvace.com/>\n' +
 				'* Released under the MIT License\n' +
