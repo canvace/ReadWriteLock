@@ -33,7 +33,7 @@ module.exports = function ReadWriteLock() {
 					table[key].readers--;
 					if (table[key].queue.length) {
 						table[key].queue[0]();
-					} else {
+					} else if (!table[key].readers) {
 						delete table[key];
 					}
 				}

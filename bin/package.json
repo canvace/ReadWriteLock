@@ -1,6 +1,6 @@
 {
 	"name": "rwlock",
-	"version": "2.1.1",
+	"version": "2.1.2",
 	"description": "Read-write lock implementation for Node.",
 	"keywords": [
 		"read",
